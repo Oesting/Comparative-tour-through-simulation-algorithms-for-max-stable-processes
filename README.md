@@ -47,4 +47,4 @@ Some auxiliary functions for the simulation are taken from and parts of simulati
 
 C. Dombry, S. Engelke & M. Oesting, "Exact simulation of max-stable processes", Biometrika 103(2), pp.303-317 
 
-avilable from [academic.oup.com](https://doi.org/10.1093/biomet/asw008)
+available from [academic.oup.com](https://doi.org/10.1093/biomet/asw008)
