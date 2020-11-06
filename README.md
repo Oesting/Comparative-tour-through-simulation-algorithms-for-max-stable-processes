@@ -2,7 +2,7 @@
 
 This is the repository for the code related to the paper
 
-M. Oesting & K. Strokorb (2020+), "A comparative tour through the simulation algorithms for max-stable processes", arXiv preprint 1809.09042.
+M. Oesting & K. Strokorb (2020+), "A comparative tour through the simulation algorithms for max-stable processes", arXiv preprint [1809.09042](https://arxiv.org/abs/1809.09042).
 
 The repository consists of two folders **Section2_DataExample** and **Section6_NumericalResults** containing the code related to the corresponding sections of the paper.
 
