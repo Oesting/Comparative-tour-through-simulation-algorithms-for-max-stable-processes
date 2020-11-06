@@ -16,7 +16,7 @@ The folder **Section2_DataExample** contains the following six files:
 - Section2.RData
 - inlandBRsimu_0001.RData
 
-*DataExample.R* allows to retrace all estimation and simulation steps in Section 2 ``Data Example''. The actual simulation procedure used therein is part of *Algorithms.R* and sourced from DataExample.R. Please find a detailed description of the functions in Algorithms.R in the folder Section6_NumericalResults and the README_algorithms.txt file therein.
+*DataExample.R* allows to retrace all estimation and simulation steps in Section 2 ``Data Example''. The actual simulation procedure used therein is part of *Algorithms.R* and sourced from DataExample.R. Please find a detailed description of the functions in Algorithms.R in the folder Section6_NumericalResults and the *README_algorithms.txt* file therein.
 
 *DataExample_Advanced.R* is an extension of DataExample.R that generates several intermediate illustrative plots along the way. It relies on *AuxiliaryFunctions.R* and loads more `R` packages related to the illustration of spatial data.
 
