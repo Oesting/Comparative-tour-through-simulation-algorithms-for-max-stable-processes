@@ -35,11 +35,11 @@ The folder **Section6_NumericalResults** contains the following four files:
 
 The three generic simulation procedures used to obtain the numerical results are included in the file *Algorithms.R*. A detailed description of the functions therein is given in *README_algorithms.txt*.
 
-*Code_SimulationStudy.R* contains sample code to recover the results of the numerical experiments for both Brown-Resnick and extremal-t processes. The input parameters for the simulation procedures in the different settings are given in *SimulationStudy_Param.RData*
+*Code_SimulationStudy.R* contains sample code to recover the results of the numerical experiments for both Brown-Resnick and extremal-t processes. The input parameters for the simulation procedures in the different settings are given in *SimulationStudy_Param.RData*.
 
 ## Data
 
-Among others, the file *Section2.RData* contain daily maximum temperatures from 1990 to 2019 that were measured at 18 inland stations in the Netherlands and are freely available from [knmi.nl](http://projects.knmi.nl/klimatologie/daggegevens/selectie.cgi).
+The file *Section2.RData* contains daily maximum temperatures from 1990 to 2019 that were measured at 18 inland stations in the Netherlands and are freely available from [knmi.nl](http://projects.knmi.nl/klimatologie/daggegevens/selectie.cgi).
 
 ## Third-Party Code
 
@@ -47,4 +47,4 @@ Some auxiliary functions for the simulation are taken from and parts of simulati
 
 C. Dombry, S. Engelke & M. Oesting, "Exact simulation of max-stable processes", Biometrika 103(2), pp.303-317 
 
-available from [academic.oup.com](https://doi.org/10.1093/biomet/asw008)
+available from [academic.oup.com](https://doi.org/10.1093/biomet/asw008).
