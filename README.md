@@ -45,6 +45,6 @@ The file *Section2.RData* contains daily maximum temperatures from 1990 to 2019 
 
 Some auxiliary functions for the simulation are taken from and parts of simulation algorithms themselves are based on the supplementary material of
 
-C. Dombry, S. Engelke & M. Oesting, Exact simulation of max-stable processes, *Biometrika* 103(2), pp.303-317 
+C. Dombry, S. Engelke & M. Oesting (2016), Exact simulation of max-stable processes, *Biometrika* 103(2), pp.303-317 
 
 available from [academic.oup.com](https://doi.org/10.1093/biomet/asw008).
