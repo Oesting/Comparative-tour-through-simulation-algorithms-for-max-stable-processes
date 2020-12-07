@@ -1,5 +1,9 @@
 ############################################################################
-########## Approach from DEO (2016) paper (incl. Dieker-Mikosch) ###########
+####### Two auxiliary functions for the simulation of the spectral #########
+####### functions for Brown-Resnick and extremal-t processes, resp. ########
+###### up to minor changes, the code was taken from the supplementary ######
+####### material of C.Dombry, S.Engelke & M.Oesting (2016), "Exact  ########
+#### simulation of max-stable processes", Biometrika 103(2), pp.303-317 ####
 ############################################################################
 
 ## internal functions: do not use any of them directly!
@@ -32,6 +36,24 @@ simu_px_extremalt <- function(no.simu=1, idx, N, dof, mu, chol.mat) {
   return(res)
 }       
 
+############################################################################
+## The following two lines may speed up your code by loading a faster random
+## number generator:
+## library(dqrng)
+## rnorm <- dqrnorm
+############################################################################
+
+############################################################################
+####### Main functions for the simulation of max-stable processes: #########
+####### - sum normalized (Dieker--Mikosch)                         #########
+####### - extremal functions                                       #########
+####### - sup-normalized                                           #########
+####### Parts of the code for the first and the second fucntion   ##########
+####### are based on the supplementary material of                ##########
+####### C.Dombry, S.Engelke & M.Oesting (2016), "Exact simulation ##########
+####### of max-stable processes", Biometrika 103(2), pp.303-317   ##########
+############################################################################
+############################################################################
 
 ###########################################################################
 ################## Dieker--Mikosch (sum normalized) #######################
@@ -92,13 +114,13 @@ simu_sumnormal <- function(no.simu=1, coord, vario, corr, dof, type,
   res      <- matrix(0, nrow=no.simu, ncol=N) ## results
   res.full <- matrix(0, nrow=no.simu, ncol=N)
   poi <- rexp(no.simu)                 ## poisson points
-  time.count      <- rep(0,no.simu)    ## number of Gaussian processes
-  time.count.full <- rep(0,no.simu)
+  counter      <- rep(0,no.simu)    ## number of Gaussian processes
+  counter.full <- rep(0,no.simu)
   
   while (any(1/poi * max.thresh > apply(res.full,1,min)))  {
     ind.full <- which(1/poi * max.thresh > apply(res,1,min))  
     ## indices of processes where potential updates might take place
-    time.count.full[ind.full] <- time.count.full[ind.full] + 1      
+    counter.full[ind.full] <- counter.full[ind.full] + 1      
     N.ind <- length(ind.full)
     cat(N.ind, " ")
     S <- sample(1:N,N.ind,replace=T,prob=rep(1/N,times=N))
@@ -118,7 +140,7 @@ simu_sumnormal <- function(no.simu=1, coord, vario, corr, dof, type,
     ind <- which(1/poi * thresh > apply(res,1,min))
     if (length(ind) > 0) {
       res[ind,] <- res.full[ind,]
-      time.count[ind] <- time.count.full[ind] 
+      counter[ind] <- counter.full[ind] 
     }
     poi[ind.full] <- poi[ind.full] + rexp(N.ind) 
   }
@@ -126,11 +148,13 @@ simu_sumnormal <- function(no.simu=1, coord, vario, corr, dof, type,
   
   if (calc.err) {
     err <- apply(res.full - res, 1, function(x) any(x > 1e-8))
-    return(list(res=res, time.count=time.count, err=err,
-                res.full=res.full, time.count.full= time.count.full))  
+    return(list(res=res, spec.counter=counter, 
+                Gauss.counter=counter, err=err,
+                res.full=res.full, spec.counter.full=counter.full,
+                Gauss.counter.full=counter.full))
   } else {
-    return(list(res=res, time.count=time.count))
-  }
+    return(list(res=res, spec.counter=counter, Gauss.counter=counter))
+  }   
 }
 
 ###########################################################################
@@ -187,12 +211,10 @@ simu_extrfcts <- function(no.simu=1, coord, vario, corr, dof, type,
   res      <- matrix(0, nrow=no.simu, ncol=N) ## results
   res.full <- matrix(0, nrow=no.simu, ncol=N)
   poi <- rexp(no.simu)                 ## poisson points
-  time.count      <- rep(0,no.simu)    ## number of Gaussian processes
-  time.count.full <- rep(0,no.simu)
+  counter      <- rep(0,no.simu)    ## number of Gaussian processes
+  counter.full <- rep(0,no.simu)
      
   res <- matrix(0, nrow=no.simu, ncol=N)
-  counter <- rep(0, times=no.simu)
-  extrfcts.counter <- rep(0, times=no.simu)
   order <- c(subindices,(1:N)[-subindices])
   stopifnot(length(unique(order))==N)
   order <- matrix(order, nrow=no.simu, ncol=N, byrow=TRUE)
@@ -211,13 +233,13 @@ simu_extrfcts <- function(no.simu=1, coord, vario, corr, dof, type,
        mu <- apply(coord, 1, function(x) corr(coord[order[1,k],]-x))    
      } else {
        stopifnot(FALSE)
-     }
+     } 
      bound <- sapply(1:no.simu, function(i) res.full[i,order[i,k]])
      while (any(1/poisson > bound)) {
        ind <- (1/poisson > bound)
        n.ind <- sum(ind)
        idx <- (1:no.simu)[ind]
-       time.count.full[ind] <- time.count.full[ind] + 1
+       counter.full[ind] <- counter.full[ind] + 1
        if (type == "brownresnick") {       
          proc <- simu_px_brownresnick(no.simu=n.ind, idx=order[idx,k], N=N, trend=trend, chol.mat=chol.mat)
        } else if (type == "extremalt") {
@@ -241,20 +263,20 @@ simu_extrfcts <- function(no.simu=1, coord, vario, corr, dof, type,
        bound <- sapply(1:no.simu, function(i) res.full[i,order[i,k]])
     } 
     if (k==n.sub) { 
-       time.count <- time.count.full
-       res <- res.full
+       counter <- counter.full
+       res     <- res.full
     }
   }
   cat("\n")
   
-  cat("\n")
-  
   if (calc.err) {
     err <- apply(res.full - res, 1, function(x) any(x > 1e-8))
-    return(list(res=res, time.count=time.count, err=err,
-                res.full=res.full, time.count.full= time.count.full))  
+    return(list(res=res, spec.counter=counter, 
+                Gauss.counter=counter, err=err,
+                res.full=res.full, spec.counter.full=counter.full,
+                Gauss.counter.full=counter.full))
   } else {
-    return(list(res=res, time.count=time.count))
+    return(list(res=res, spec.counter=counter, Gauss.counter=counter))
   }   
 }
 
@@ -317,16 +339,15 @@ simu_supnormal <- function(no.simu=1, coord, vario, corr, dof, type,
     res <- matrix(0, nrow=no.simu, ncol=N) ## results
     res.full <- matrix(0, nrow=no.simu, ncol=N)
     poi <- rexp(no.simu)                 ## poisson points
-    time.count      <- rep(0,no.simu)    ## number of spectral processes
-    time.count.full <- rep(0,no.simu)
-    Gauss.time.count      <- rep(0,no.simu) ## number of Gaussian processes 
-    Gauss.time.count.full <- rep(0,no.simu)
-    rej.counter <- 0
+    counter      <- rep(0,no.simu)    ## number of spectral processes
+    counter.full <- rep(0,no.simu)
+    Gauss.counter      <- rep(0,no.simu) ## number of Gaussian processes 
+    Gauss.counter.full <- rep(0,no.simu)
     extr.coeff  <- 0
         
     while (any(1/poi * max.thresh > apply(res.full,1,min)))  {
       ind.full <- which(1/poi * max.thresh > apply(res.full,1,min))  ## indices of processes where potential updates might take place according to thresh.slow
-      time.count.full[ind.full] <- time.count.full[ind.full] + 1      
+      counter.full[ind.full] <- counter.full[ind.full] + 1      
       N.ind <- length(ind.full)
       cat(N.ind, "")
       W <- matrix(NA, nrow=N.ind, ncol=N)
@@ -340,8 +361,8 @@ simu_supnormal <- function(no.simu=1, coord, vario, corr, dof, type,
         } else {
           stopifnot(FALSE)
         }
-        Gauss.time.count.full[ind.full][prop.ind] <- 
-               Gauss.time.count.full[ind.full][prop.ind] + 1
+        Gauss.counter.full[ind.full][prop.ind] <- 
+               Gauss.counter.full[ind.full][prop.ind] + 1
         extr.coeff <- extr.coeff + sum(apply(W.prop, 1, max))
         acc.probab <- apply(W.prop,1,max)/apply(W.prop,1,sum)
         coins <- runif(length(prop.ind))
@@ -353,26 +374,25 @@ simu_supnormal <- function(no.simu=1, coord, vario, corr, dof, type,
       ind <- which(1/poi * rel.thresh > apply(res,1,min))
       if (length(ind) > 0) {
         res[ind,] <- res.full[ind,]
-        time.count[ind] <- time.count.full[ind] 
-        Gauss.time.count[ind] <- Gauss.time.count.full[ind]
+        counter[ind] <- counter.full[ind] 
+        Gauss.counter[ind] <- Gauss.counter.full[ind]
       }
       poi[ind.full] <- poi[ind.full] + rexp(N.ind) 
     }
     cat("\n")
     
-    extr.coeff  <- extr.coeff / sum(Gauss.time.count.full)
+    extr.coeff  <- extr.coeff / sum(Gauss.counter.full)
     res.full <- res.full * extr.coeff
     res      <- res      * extr.coeff
     
     if (calc.err) {
       err <- apply(res.full - res, 1, function(x) any(x > 1e-8))
-      return(list(res=res, spec.proc.count=time.count, 
-                  Gauss.proc.count=Gauss.time.count, err=err,
-                  res.full=res.full, 
-                  spec.proc.count.full= time.count.full,
-                  Gauss.proc.count.full=Gauss.time.count.full))  
+      return(list(res=res, spec.counter=counter, 
+                  Gauss.counter=Gauss.counter, err=err,
+                  res.full=res.full, spec.counter.full= counter.full,
+                  Gauss.counter.full=Gauss.counter.full))  
     } else {
-      return(list(res=res, spec.proc.count=time.count, 
-                  Gauss.proc.count=Gauss.time.count))
+      return(list(res=res, spec.counter=counter, 
+                  Gauss.counter=Gauss.counter))
     }
 }
