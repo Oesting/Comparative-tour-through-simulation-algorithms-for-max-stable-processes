@@ -276,7 +276,7 @@ simu_extrfcts <- function(no.simu=1, coord, vario, corr, dof, type,
                 res.full=res.full, spec.counter.full=counter.full,
                 Gauss.counter.full=counter.full))
   } else {
-    return(list(res=res, counter=counter, Gauss.counter=counter))
+    return(list(res=res, spec.counter=counter, Gauss.counter=counter))
   }   
 }
 
