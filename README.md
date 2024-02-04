@@ -1,4 +1,4 @@
-# Comparative-tour-through-simulation-algorithms-for-max-stable-processes
+# Comparative tour through the simulation algorithms for max-stable processes
 
 This is the repository for the code related to the paper
 
